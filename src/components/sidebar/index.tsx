@@ -15,7 +15,10 @@ export function Sidebar() {
   ]
   return (
     <div className="flex flex-col justify-start h-full p-4 min-w-22 ">
-      <h1>Sidebar</h1>
+      <div className="flex justify-center items-center gap-2">
+        <img src="/light.png" alt="Logo" className="rounded-full h-12 w-12" />
+        <h1 className="my-4 font-extrabold text-lg">Parking System</h1>
+      </div>
       <Separator className="my-2" />
       <NavigationMenu className="items-start">
         <NavigationMenuList className="flex-col items-stretch justify-start text-left">

@@ -58,36 +58,38 @@ const ParkingChart = () => {
   // const motorcycleDifference = vehicleReport.data.totalMotorcycleEntries - vehicleReport.data.totalCarEntries;
 
   return (
-    <div className="p-8">
-      <h2 className="text-2xl font-bold mb-4">Entrada e Saída de Veículos</h2>
-
-      {/* Totais Gerais */}
-      <div className="mb-8">
-        <h3 className="text-lg font-bold mb-2">Totais Gerais:</h3>
-        <p>Entradas: {entryExitSummary.totalEntries}</p>
-        <p>Saídas: {entryExitSummary.totalExits}</p>
-      </div>
-
+    <div className="flex justify-start pr-6 items-start w-full">
       {/* Gráfico de Entradas e Saídas por Período */}
       <div className="mb-8">
-        <h3 className="text-lg font-bold mb-2">Entradas e Saídas por Período:</h3>
-        <BarChart width={800} height={400} data={data} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+        <h2 className="text-2xl font-bold mb-4">Entrada e Saída de Veículos</h2>
+        {/* <h3 className="text-lg font-bold mb-2">Entradas e Saídas por Período:</h3> */}
+        <BarChart width={600} height={240} data={data} margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="hour" />
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="entries" fill="#8884d8" name="Entradas" />
-          <Bar dataKey="exits" fill="#82ca9d" name="Saídas" />
+          <Bar dataKey="entries" fill="#43991c" name="Entradas" />
+          <Bar dataKey="exits" fill="#d92121" name="Saídas" />
         </BarChart>
       </div>
 
-      {/* Relatório de Entradas por Tipo de Veículo */}
-      <div className="mt-8">
-        <h3 className="text-lg font-bold mb-2">Entradas por Tipo de Veículo:</h3>
-        <p>Carros: {vehicleReport.data.totalCarEntries}</p>
-        <p>Motocicletas: {vehicleReport.data.totalMotorcycleEntries}</p>
-        <p>Diferença (Carros - Motos): {carDifference}</p>
+      <div className='flex justify-start gap-8 content-start align-top items-start text-start'>
+        {/* Totais Gerais */}
+        <div className="my-14">
+          <h3 className="text-lg font-bold mb-2">Totais Gerais:</h3>
+          <p>Entradas: {entryExitSummary.totalEntries}</p>
+          <p>Saídas: {entryExitSummary.totalExits}</p>
+        </div>
+
+
+        {/* Relatório de Entradas por Tipo de Veículo */}
+        <div className="my-14">
+          <h3 className="text-lg font-bold mb-2">Entradas por Tipo de Veículo:</h3>
+          <p>Carros: {vehicleReport.data.totalCarEntries}</p>
+          <p>Motocicletas: {vehicleReport.data.totalMotorcycleEntries}</p>
+          <p>Diferença (Carros - Motos): {carDifference}</p>
+        </div>
       </div>
     </div>
 

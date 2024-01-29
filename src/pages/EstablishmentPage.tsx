@@ -57,7 +57,7 @@ export default function EstablishmentPage() {
     if (selectedEstablishment) {
       const getPeriodSummary = async () => {
         try {
-          const response = await api.post(`/summary/period/${selectedEstablishment.id}`, {startDate: '2022-09-01', endDate: '2024-09-30'});
+          const response = await api.post(`/summary/period/${selectedEstablishment.id}`, { startDate: '2022-09-01', endDate: '2024-09-30' });
           const { entryExitSummary } = response.data;
           setPeriodSummary(entryExitSummary);
         } catch (error) {
@@ -110,7 +110,7 @@ export default function EstablishmentPage() {
                 role="combobox"
                 aria-expanded={open}
                 className="w-[300px] justify-between text-ellipsis"
-               >
+              >
                 {value
                   ? establishments.find((establishment: { id: string; }) => establishment.id === value)?.name :
                   establishments[0].name ? establishments[0].name : "Selecione..."}
@@ -149,44 +149,37 @@ export default function EstablishmentPage() {
       </div>
       <header className="flex gap-6 px-4 justify-evenly">
         <Card className="w-full">
-          <CardHeader className="text-2xl font-bold flex" >Total de Vagas</CardHeader>
-          <CardContent className="flex flex-col gap-2">
-            {selectedEstablishment && <p>
-              {Number(selectedEstablishment.carSpaces)
-                + Number(selectedEstablishment.motorcycleSpaces)} utilizando {''}
-               {Number(selectedEstablishment.occupiedCarSpaces) +
-                Number(selectedEstablishment.occupiedMotorcycleSpaces)}
-            </p>}
-          </CardContent>
-        </Card>
-        <Card className="w-full">
-          <CardHeader className="text-2xl font-bold flex" >Vagas de carros</CardHeader>
-          <CardContent className="flex flex-col gap-2">
-            {selectedEstablishment && <p>total {selectedEstablishment.carSpaces}</p>}
-            {selectedEstablishment && <p>ocupadas {selectedEstablishment.occupiedCarSpaces}</p>}
-          </CardContent>
-        </Card>
-        <Card className="w-full">
-          <CardHeader className="text-2xl font-bold flex" >Vagas de motos</CardHeader>
-          <CardContent className="flex flex-col gap-2">
-            {selectedEstablishment && <p>total {selectedEstablishment.motorcycleSpaces}</p>}
-            {selectedEstablishment && <p>ocupadas {selectedEstablishment.occupiedMotorcycleSpaces}</p>}
-          </CardContent>
-        </Card>
-        <Card className="w-full">
-          <CardHeader className="text-2xl font-bold flex" >Sumário</CardHeader>
+          <CardHeader className="text-center text-2xl font-bold flex" >Visão Geral</CardHeader>
           <CardContent className="flex flex-col gap-2">
             {summary && <p>
               Entradas: {summary.totalEntries} <br />
               Saídas: {summary.totalExits} <br />
-              Carros: {summary.totalCarEntries} X {summary.totalCarExits} <br />
-              Motos: {summary.totalMotorcycleEntries} X {summary.totalMotorcycleExits} <br />
+              {/* Carros: {summary.totalCarEntries} X {summary.totalCarExits} <br /> */}
+              {/* Motos: {summary.totalMotorcycleEntries} X {summary.totalMotorcycleExits} <br /> */}
 
             </p>}
           </CardContent>
         </Card>
+        <Card className="w-full">
+          <CardHeader className="text-center text-2xl font-bold flex" >Vagas de Carros</CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            {selectedEstablishment && <p className="text-center font-semibold">Total {selectedEstablishment.carSpaces}</p>}
+            {selectedEstablishment && <p>Ocupadas {selectedEstablishment.occupiedCarSpaces}</p>}
+            {selectedEstablishment && <p>Disponíveis {selectedEstablishment.carSpaces - selectedEstablishment.occupiedCarSpaces}</p>}
+          </CardContent>
+        </Card>
+        <Card className="w-full">
+          <CardHeader className="text-center text-2xl font-bold flex" >Vagas de Motos</CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            {selectedEstablishment && <p className="text-center font-semibold">Total {selectedEstablishment.motorcycleSpaces}</p>}
+            {selectedEstablishment && <p>Ocupadas {selectedEstablishment.occupiedMotorcycleSpaces}</p>}
+            {selectedEstablishment && <p>Disponíveis {selectedEstablishment.motorcycleSpaces - selectedEstablishment.occupiedMotorcycleSpaces}</p>}
+          </CardContent>
+        </Card>
       </header>
-      <ParkingChart />
+      <div className="flex justify-start">
+        <ParkingChart />
+      </div>
       {/* {periodSummary && <ParkingChart periodSummary={periodSummary} entryExitSummary={summary} />} */}
     </section>
   )

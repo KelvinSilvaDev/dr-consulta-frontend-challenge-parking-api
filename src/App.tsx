@@ -26,7 +26,9 @@ function App() {
           <header className="flex flex-row justify-end items-center w-full h-16 px-4">
             <ModeToggle />
           </header>
-          <Outlet />
+          <section className="overflow-y-auto w-full">
+            <Outlet />
+          </section>
         </div>
       </main>
     </ThemeProvider>
