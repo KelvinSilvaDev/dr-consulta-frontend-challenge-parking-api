@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import api from "@/services/api";
 import React from "react";
 import { useEffect, useState } from "react";
 import { Check } from 'lucide-react'
 import { Summary } from "@/types/Summary";
+import { axiosPrivate } from "@/services/api";
 
 export default function EstablishmentPage() {
   const [establishments, setEstablishments] = useState<any>([]);
@@ -22,7 +22,7 @@ export default function EstablishmentPage() {
   useEffect(() => {
     const getStablishments = async () => {
       try {
-        const response = await api.get("/establishment");
+        const response = await axiosPrivate.get("/establishment");
         const { data } = await response.data;
         setEstablishments(data);
       } catch (error) {
@@ -42,7 +42,7 @@ export default function EstablishmentPage() {
     if (selectedEstablishment) {
       const getSummary = async () => {
         try {
-          const response = await api.get(`/summary/${selectedEstablishment.id}`);
+          const response = await axiosPrivate.get(`/summary/${selectedEstablishment.id}`);
           const period = await response.data;
           setSummary(period);
         } catch (error) {
@@ -57,7 +57,7 @@ export default function EstablishmentPage() {
     if (selectedEstablishment) {
       const getPeriodSummary = async () => {
         try {
-          const response = await api.post(`/summary/period/${selectedEstablishment.id}`, { startDate: '2022-09-01', endDate: '2024-09-30' });
+          const response = await axiosPrivate.post(`/summary/period/${selectedEstablishment.id}`, { startDate: '2022-09-01', endDate: '2024-09-30' });
           const { entryExitSummary } = response.data;
           setPeriodSummary(entryExitSummary);
         } catch (error) {

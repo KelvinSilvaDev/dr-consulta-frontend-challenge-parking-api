@@ -1,51 +1,8 @@
-// import { Metadata } from "next"
-// import Image from "next/image"
-// import Link from "next/link"
-
 import { buttonVariants } from "@/components/ui/button";
 import { UserAuthForm } from "@/components/user-auth-form";
-import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import { Navigate } from "react-router-dom";
-// import api from "@/services/api";
-// import { useEffect, useState } from "react";
 import { Link } from "react-router-dom"
-// import { cn } from "@/lib/utils"
-// import { buttonVariants } from "@/registry/new-york/ui/button"
-// import { UserAuthForm } from "@/app/examples/authentication/components/user-auth-form"
-
-// export const metadata: Metadata = {
-//   title: "Authentication",
-//   description: "Authentication forms built using the components.",
-// }
-
 export default function LoginPage() {
-  // const [isLoading, setIsLoading] = useState<boolean>(false)
-  // useEffect(() => {
-  //   const login = async () => {
-  //     try {
-  //       setIsLoading(true)
-  //       const response = await api.post('/auth/login', form);
-  //       const { token } = response.data;
-  //       localStorage.setItem('@token', token);
-  //       setIsLoading(false)
-  //     } catch (error) {
-  //       console.error('Erro no login:', error);
-  //       setIsLoading(false)
-  //     }
-  //   }
-
-  //   login()
-  // }, [])
-
-  const {isAuthenticated} = useAuth()
-
-  
-
-  // console.log('isLoading', isLoading)
-  if (isAuthenticated) {
-    return <Navigate to="/" />;
-  }
 
   return (
     <>
@@ -76,9 +33,9 @@ export default function LoginPage() {
               </p>
             </div>
             <UserAuthForm />
-            <p className="px-8 text-center text-sm text-muted-foreground">
+            {/* <p className="px-8 text-center text-sm text-muted-foreground">
               By clicking continue, you agree to our{" "}
-              {/* <Link
+              <Link
                 href="/terms"
                 className="underline underline-offset-4 hover:text-primary"
               >
@@ -90,9 +47,9 @@ export default function LoginPage() {
                 className="underline underline-offset-4 hover:text-primary"
               >
                 Privacy Policy
-              </Link> */}
+              </Link> 
               .
-            </p>
+            </p> */}
           </div>
         </div>
       </div>

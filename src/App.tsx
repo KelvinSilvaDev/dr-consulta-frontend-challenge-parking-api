@@ -1,24 +1,15 @@
 import { Outlet } from "react-router-dom"
 import { Sidebar } from "./components/sidebar"
 import { Separator } from "./components/ui/separator"
-import { ThemeProvider } from "./components/theme-provider"
 import { ModeToggle } from "./components/mode-toggle"
-import { useAuth } from "./hooks/useAuth"
+import { AuthProvider } from "./contexts/AuthContext"
 
 
 function App() {
-  const { isAuthenticated } = useAuth()
-
-  if (!isAuthenticated) {
-    return (
-      <ThemeProvider>
-        <Outlet />
-      </ThemeProvider>
-    )
-  }
+  
 
   return (
-    <ThemeProvider>
+    <AuthProvider>
       <main className="flex w-full justify-start h-screen">
         <Sidebar />
         <Separator orientation="vertical" className="mx-2" />
@@ -31,7 +22,7 @@ function App() {
           </section>
         </div>
       </main>
-    </ThemeProvider>
+    </AuthProvider>
   )
 }
 
