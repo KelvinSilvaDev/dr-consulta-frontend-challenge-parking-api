@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import { Check } from 'lucide-react'
 import { Summary } from "@/types/Summary";
 import { axiosPrivate } from "@/services/api";
+import { DateRange } from "react-day-picker";
+import { DatePickerWithRange } from "@/components/DatePicker";
 
 export default function EstablishmentPage() {
   const [establishments, setEstablishments] = useState<any>([]);
@@ -18,6 +20,11 @@ export default function EstablishmentPage() {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
   const [periodSummary, setPeriodSummary] = useState<any>(null);
+  const [periodSummaryDate, setPeriodSummaryDate] = useState<DateRange | string | undefined>({
+    from: new Date(2022, 0, 20),
+    to: new Date(2022, 0, 21),
+  })
+  const [vehicleReport, setVehicleReport] = useState<any>(null);
 
   useEffect(() => {
     const getStablishments = async () => {
@@ -43,8 +50,8 @@ export default function EstablishmentPage() {
       const getSummary = async () => {
         try {
           const response = await axiosPrivate.get(`/summary/${selectedEstablishment.id}`);
-          const period = await response.data;
-          setSummary(period);
+          const { entryExitSummary } = await response.data;
+          setSummary(entryExitSummary);
         } catch (error) {
           console.error(error);
         }
@@ -53,50 +60,38 @@ export default function EstablishmentPage() {
     }
   }, [selectedEstablishment]);
 
+
+
   useEffect(() => {
-    if (selectedEstablishment) {
+    if (periodSummaryDate) {
       const getPeriodSummary = async () => {
         try {
           const response = await axiosPrivate.post(`/summary/period/${selectedEstablishment.id}`, { startDate: '2022-09-01', endDate: '2024-09-30' });
-          const { entryExitSummary } = response.data;
+          const { entryExitSummary } = await response.data;
           setPeriodSummary(entryExitSummary);
+          console.log(periodSummary)
         } catch (error) {
           console.error(error);
         }
       }
       getPeriodSummary();
     }
-  }, [selectedEstablishment]);
+  }, [periodSummaryDate]);
 
-  console.log(establishments);
-  console.log(summary)
-  console.log(periodSummary)
-
-  // const frameworks = [
-  //   {
-  //     value: "next.js",
-  //     label: "Next.js",
-  //   },
-  //   {
-  //     value: "sveltekit",
-  //     label: "SvelteKit",
-  //   },
-  //   {
-  //     value: "nuxt.js",
-  //     label: "Nuxt.js",
-  //   },
-  //   {
-  //     value: "remix",
-  //     label: "Remix",
-  //   },
-  //   {
-  //     value: "astro",
-  //     label: "Astro",
-  //   },
-  // ]
-
-
-  console.log('selectedEstablishment', selectedEstablishment)
+  useEffect(() => {
+    if (selectedEstablishment) {
+      const getVehicleReport = async () => {
+        try {
+          const response = await axiosPrivate.get(`/report/establishment/${selectedEstablishment.id}`);
+          const { data } = await response.data;
+          setVehicleReport(data);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      getVehicleReport();
+    }
+  }, [selectedEstablishment])
 
   return (
     <section className="w-full px-4 space-y-6">
@@ -178,9 +173,9 @@ export default function EstablishmentPage() {
         </Card>
       </header>
       <div className="flex justify-start">
-        <ParkingChart />
+        <DatePickerWithRange setPeriodSummaryDate={setPeriodSummaryDate} />
+        <ParkingChart periodSummary={periodSummary} entryExitSummary={summary} vehicleReport={vehicleReport} />
       </div>
-      {/* {periodSummary && <ParkingChart periodSummary={periodSummary} entryExitSummary={summary} />} */}
     </section>
   )
 }
