@@ -28,7 +28,7 @@ export default function RegisterPage() {
                 Cadastro
               </h1>
               <p className="text-sm text-muted-foreground">
-                Insira seu nome de usuário e senha para acessar o sistema.
+                Insira seus dados para se cadastrar mo sistema.
               </p>
             </div>
             <UserRegisterForm />
