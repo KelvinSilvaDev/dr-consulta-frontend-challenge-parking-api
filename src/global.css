@@ -78,7 +78,7 @@
   }
   .dark input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 50px #030816 inset; 
-    -webkit-text-fill-color: white;
+    -webkit-text-fill-color: white; 
   }
   .dark input:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0 50px #07122f inset;
@@ -93,5 +93,4 @@
     -webkit-box-shadow: 0 0 0 50px #dcdcdc inset;
     -webkit-text-fill-color: black;
   }
-
-  
+}
