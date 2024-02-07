@@ -1,13 +1,13 @@
 import Layout from "@/Layout";
 import ErrorPage from "../pages/404";
 import EstablishmentPage from "../pages/EstablishmentPage";
-import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import {
   createBrowserRouter,
 } from "react-router-dom";
 import App from "@/App";
+import CreateEstablihsment from "@/pages/CreateEstablihsment";
 
 export const router = createBrowserRouter([
   {
@@ -17,12 +17,16 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <HomePage />,
-      },
-      {
-        path: "establishment",
         element: <EstablishmentPage />,
       },
+      {
+        path: "establishment/:id",
+        element: <EstablishmentPage />,
+      },
+      {
+        path: "establishment/new",
+        element: <CreateEstablihsment />,
+      }
     ],
   },
   {

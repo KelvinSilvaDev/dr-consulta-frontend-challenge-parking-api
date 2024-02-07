@@ -10,21 +10,82 @@ import { useEffect, useState } from "react";
 import { Check } from 'lucide-react'
 import { Summary } from "@/types/Summary";
 import { axiosPrivate } from "@/services/api";
-import { DateRange } from "react-day-picker";
-import { DatePickerWithRange } from "@/components/DatePicker";
+import { useNavigate } from "react-router-dom";
+import CreateEntry from "@/components/CreateEntry";
+import { Vehicle } from "@/types/Vehicle";
+import { Establishment } from "@/types/Establihsment";
+import { Form, FormControl } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { z } from "zod"
+import { toast } from "sonner"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const newVehicleSchema = z.object({
+  brand: z.string(),
+  model: z.string(),
+  color: z.string(),
+  type: z.string(),
+  licensePlate: z.string(),
+  cnh: z.string(),
+})
+
+type FormValuesForNewVehicle = z.infer<typeof newVehicleSchema>;
 
 export default function EstablishmentPage() {
   const [establishments, setEstablishments] = useState<any>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const [parkingRecords, setParkingRecords] = useState<any>([])
   const [selectedEstablishment, setSelectedEstablishment] = useState<any>(null);
+  const [vehicleReport, setVehicleReport] = useState<any>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [open, setOpen] = React.useState(false)
+  const [opened, setOpened] = React.useState(false)
   const [value, setValue] = React.useState("")
-  const [periodSummary, setPeriodSummary] = useState<any>(null);
-  const [periodSummaryDate, setPeriodSummaryDate] = useState<DateRange | string | undefined>({
-    from: new Date(2022, 0, 20),
-    to: new Date(2022, 0, 21),
-  })
-  const [vehicleReport, setVehicleReport] = useState<any>(null);
+
+
+
+  useEffect(() => {
+    const getVehicles = async () => {
+      try {
+        const response = await axiosPrivate.get("/vehicles");
+        const { data } = await response.data;
+        setVehicles(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getVehicles();
+  }, []);
+
+
+  const getParkingRecords = async () => {
+    try {
+      const response = await axiosPrivate.get("/parking-records");
+      const { data } = response;
+      setParkingRecords(data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  useEffect(() => {
+    getParkingRecords();
+  }, [parkingRecords.length])
+
+  const handleRegisterExit = async (id: number) => {
+    try {
+      const response = await axiosPrivate.put(`/parking-records/${id}/`);
+      const { data } = response;
+      console.log(data);
+      getParkingRecords();
+      toast.success('Saída registrada com sucesso');
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getStablishments = async () => {
@@ -60,24 +121,6 @@ export default function EstablishmentPage() {
     }
   }, [selectedEstablishment]);
 
-
-
-  useEffect(() => {
-    if (periodSummaryDate) {
-      const getPeriodSummary = async () => {
-        try {
-          const response = await axiosPrivate.post(`/summary/period/${selectedEstablishment.id}`, { startDate: '2022-09-01', endDate: '2024-09-30' });
-          const { entryExitSummary } = await response.data;
-          setPeriodSummary(entryExitSummary);
-          console.log(periodSummary)
-        } catch (error) {
-          console.error(error);
-        }
-      }
-      getPeriodSummary();
-    }
-  }, [periodSummaryDate]);
-
   useEffect(() => {
     if (selectedEstablishment) {
       const getVehicleReport = async () => {
@@ -93,65 +136,161 @@ export default function EstablishmentPage() {
     }
   }, [selectedEstablishment])
 
+  const handleRedirect = () => {
+    navigate("/establishment/new", { replace: true });
+  }
+
+
+  const form = useForm<FormValuesForNewVehicle>({
+    resolver: zodResolver(newVehicleSchema),
+  });
+
+
+  const registerNewVehicle = async (vehicle: FormValuesForNewVehicle) => {
+    try {
+      const response = await axiosPrivate.post('vehicles', vehicle);
+      const { data } = await response.data;
+      toast.success('Veículo registrado na base de dados');
+      return data;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const onSubmit = async (data: FormValuesForNewVehicle) => {
+
+    const newVehicle = {
+      brand: data.brand,
+      model: data.model,
+      color: data.color,
+      type: data.type,
+      licensePlate: data.licensePlate,
+      cnh: data.cnh
+    }
+
+    const vehicle = await registerNewVehicle(newVehicle);
+
+    await axiosPrivate.post('parking-records', {
+      vehicle: { id: vehicle.id },
+      establishment: { id: selectedEstablishment.id },
+    })
+    form.reset
+    toast.success('Entrada registrada com sucesso');
+    getParkingRecords();
+
+  }
+
+
   return (
     <section className="w-full px-4 space-y-6">
-      <div className="w-full flex justify-between align-middle items-center pl-4 pr-8">
+      <div className="w-full flex flex-col lg:flex-row justify-between align-middle items-center px-4">
         <h1 className="my-4">Estabelecimentos</h1>
-        {establishments.length > 0 && (
-          <Popover open={open} onOpenChange={setOpen}>
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <Button variant="outline" className="w-full md:w-auto" onClick={handleRedirect}>Novo Estabelecimento</Button>
+          {selectedEstablishment && <Popover open={opened} onOpenChange={setOpened}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-[300px] justify-between text-ellipsis"
+                aria-expanded={opened}
+                className="w-200 justify-between text-elipsis w-full md:w-auto"
               >
-                {value
-                  ? establishments.find((establishment: { id: string; }) => establishment.id === value)?.name :
-                  establishments[0].name ? establishments[0].name : "Selecione..."}
-                {/* <Check className="ml-2 h-4 w-4 shrink-0 opacity-50" /> */}
+                Registrar nova entrada
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandInput placeholder="Search framework..." className="h-9" />
-                <CommandEmpty>No framework found.</CommandEmpty>
-                <CommandGroup>
-                  {establishments.map((establishment: any) => (
-                    <CommandItem
-                      key={establishment.id}
-                      value={establishment.id}
-                      onSelect={(currentValue) => {
-                        setValue(currentValue === value ? "" : currentValue)
-                        setSelectedEstablishment(establishment)
-                        setOpen(false)
-                      }}
-                    >
-                      {establishment.name}
-                      <Check
-                        className={cn(
-                          "ml-auto h-4 w-4",
-                          value === establishment.id ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </Command>
+            <PopoverContent className="w-[300px] p-4 flex-col">
+              <CreateEntry selectedEstablishment={selectedEstablishment} vehicles={vehicles} establishments={establishments} />
+              <h1>Novo veiculo</h1>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 grid-cols-2">
+                  <div className="col-span-2">
+                    <Input placeholder="Marca" {...form.register('brand')} />
+                  </div>
+                  <div className="col-span-2">
+                    <Input placeholder="Modelo" {...form.register('model')} />
+                  </div>
+                  <div className="col-span-2">
+                    <Input placeholder="Cor" {...form.register('color')} />
+                  </div>
+                  <FormControl>
+                    <Select onValueChange={
+                      (value) => {
+                        form.setValue('type', value);
+                      }
+                    } >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="Car">Carro</SelectItem>
+                          <SelectItem value="Motorcycle">Moto</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <div className="col-span-2">
+                    <Input placeholder="Placa" {...form.register('licensePlate')} />
+                  </div>
+                  <div className="col-span-2">
+                    <Input placeholder="CNH" {...form.register('cnh')} />
+                  </div>
+                  <div className="col-span-2">
+                    <Button type="submit">Registrar</Button>
+                  </div>
+                </form>
+              </Form>
             </PopoverContent>
-          </Popover>
-        )}
+          </Popover>}
+          {establishments.length > 0 && (
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-[300px] justify-between text-ellipsis"
+                >
+                  {value ? establishments.find((establishment: { id: string, name: string }) => establishment.id === value)?.name : "Selecione..."}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px] p-0">
+                <Command>
+                  <CommandInput placeholder="Pesquisar..." className="h-9" />
+                  <CommandEmpty>Estabelecimento não encontrado.</CommandEmpty>
+                  <CommandGroup>
+                    {establishments.map((establishment: Establishment) => (
+                      <CommandItem
+                        key={establishment.id}
+                        value={establishment.id}
+                        onSelect={(currentValue) => {
+                          setValue(currentValue === value ? "" : currentValue)
+                          setSelectedEstablishment(establishment)
+                          setOpen(false)
+                        }}
+                      >
+                        {establishment.name}
+                        <Check
+                          className={cn(
+                            "ml-auto h-4 w-4",
+                            value === establishment.id ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          )}
+        </div>
       </div>
-      <header className="flex gap-6 px-4 justify-evenly">
+      <header className="flex flex-col xl:flex-row gap-6 px-4 justify-evenly">
         <Card className="w-full">
           <CardHeader className="text-center text-2xl font-bold flex" >Visão Geral</CardHeader>
           <CardContent className="flex flex-col gap-2">
             {summary && <p>
               Entradas: {summary.totalEntries} <br />
               Saídas: {summary.totalExits} <br />
-              {/* Carros: {summary.totalCarEntries} X {summary.totalCarExits} <br /> */}
-              {/* Motos: {summary.totalMotorcycleEntries} X {summary.totalMotorcycleExits} <br /> */}
-
             </p>}
           </CardContent>
         </Card>
@@ -172,9 +311,34 @@ export default function EstablishmentPage() {
           </CardContent>
         </Card>
       </header>
-      <div className="flex justify-start">
-        <DatePickerWithRange setPeriodSummaryDate={setPeriodSummaryDate} />
-        <ParkingChart periodSummary={periodSummary} entryExitSummary={summary} vehicleReport={vehicleReport} />
+      <div className="flex flex-col md:flex-row justify-start w-full gap-4 px-4">
+        <div className="flex-1">
+          <ParkingChart entryExitSummary={summary} vehicleReport={vehicleReport} />
+        </div>
+        <div className="flex-1 flex flex-col items-start gap-4">
+          <Card className="w-full">
+            {selectedEstablishment ? (
+              <CardHeader className="text-center text-2xl font-bold flex">
+                {parkingRecords.filter((record: any) => record.establishment.id === selectedEstablishment?.id && record.exitTime === null).length > 0 ? 'Últimas entradas' : 'Sem Registros'}
+              </CardHeader>
+            ) : (
+              <CardHeader className="text-center text-2xl font-bold flex">
+                Selecione um estabelecimento
+              </CardHeader>
+            )}
+            <CardContent className="p-0 flex flex-col gap-2 overflow-y-auto  max-h-40 ">
+              {
+                parkingRecords.filter((record: any) => record.establishment.id === selectedEstablishment?.id && record.exitTime === null).map((record: any) => (
+                  <div key={record.id} className="w-full flex lg justify-between items-center hover:bg-slate-800 p-4 gap-2">
+                    <p className="text-md">{record.vehicle.licensePlate} - {record.vehicle.brand} {record.vehicle.model} </p>
+                    <Button size="sm" onClick={() => handleRegisterExit(record.id)}>Registrar Saída</Button>
+                  </div>
+                ))
+              }
+
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </section>
   )

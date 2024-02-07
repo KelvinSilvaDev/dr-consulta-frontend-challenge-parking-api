@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 export interface AuthContextProps {
   isAuthenticated: boolean;
+  register: (username: string, password: string, email: string, name: string) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -36,6 +37,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const navigate = useNavigate();
 
+  const register = async (username: string, password: string, email: string, name: string): Promise<void> => {
+    try {
+      const response = await axiosPublic.post('/auth/register', { username, password, email, name });
+      const { token } = response.data;
+
+      setAuthorizationHeader(token);
+      localStorage.setItem('@token', token);
+      setIsAuthenticated(true);
+      return navigate("/", { replace: true });
+    } catch (error) {
+      console.error('Erro no login:', error);
+      throw error;
+    }
+  }
+
   const login = async (username: string, password: string): Promise<void> => {
     try {
       const response = await axiosPublic.post('/auth/login', { username, password });
@@ -59,7 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, register, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

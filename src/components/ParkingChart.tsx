@@ -1,56 +1,49 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const ParkingChart = ({ periodSummary, vehicleReport, entryExitSummary }: any) => {
-  const data = periodSummary?.result.map((entry: { hour: any; totalEntries: string; }) => ({
-    hour: entry.hour,
-    entries: parseInt(entry.totalEntries, 10),
-    exits: 0, 
-  }));
+const ParkingChart = ({ vehicleReport, entryExitSummary }: any) => {
 
-  periodSummary?.totalExits?.forEach((exit: { hour: any; totalExits: string; }) => {
-    const exitIndex = data.findIndex((entry: { hour: any; }) => entry.hour === exit.hour);
-    if (exitIndex !== -1) {
-      data[exitIndex].exits = parseInt(exit.totalExits, 10);
-    }
-  });
 
-  const carDifference = vehicleReport && vehicleReport.data
-  ? vehicleReport.data.totalCarEntries - vehicleReport.data.totalMotorcycleEntries
-  : 0;
+  console.log('Esse é o registro que vem da api', vehicleReport, entryExitSummary)
+
+  const combinedData = {
+    ...entryExitSummary,
+    ...vehicleReport,
+  };
+
+  const chartData = [
+    {
+      name: 'Entradas',
+      total: combinedData.totalEntries,
+      carEntries: Array.isArray(combinedData.totalCarEntries) ? combinedData.totalCarEntries.length : 0,
+      motorcycleEntries: Array.isArray(combinedData.totalMotorcycleEntries) ? combinedData.totalMotorcycleEntries.length : 0,
+    },
+    {
+      name: 'Saídas',
+      totalExits: combinedData.totalExits,
+      carExits: Array.isArray(combinedData.totalCarExits) ? combinedData.totalCarExits.length : 0,
+      motorcycleExits: Array.isArray(combinedData.totalMotorcycleExits) ? combinedData.totalMotorcycleExits.length : 0,
+    },
+  ];
+
+
 
   return (
-    <div className="flex justify-start pr-6 items-start w-full">
-      <div className="mb-8">
-        <div className="flex justify-between">
-          <h2 className="text-2xl font-bold mb-4">Entrada e Saída de Veículos</h2>
-        </div>
-        <BarChart width={600} height={240} data={data} margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="hour" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="entries" fill="#43991c" name="Entradas" />
-          <Bar dataKey="exits" fill="#d92121" name="Saídas" />
-        </BarChart>
-      </div>
+    <ResponsiveContainer width="100%" height={300} style={{ margin: '0 auto' }}>
+      <BarChart data={chartData} margin={{ left: -20, right: 0, top: 0, bottom: 0 }}>
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="total" name='Total de Entradas' fill="#ff6b81" />
+        <Bar dataKey="carEntries" name='Carros' fill="#8e44ad" />
+        <Bar dataKey="motorcycleEntries" name='Motos' fill="#f39c12" />
+        <Bar dataKey="totalExits" name='Total de Saídas' fill="#27ae60" />
+        <Bar dataKey="carExits" name='Carros' fill="#8e44ad" />
+        <Bar dataKey="motorcycleExits" name='Motos' fill="#f39c12" />
 
-      <div className='flex justify-start gap-8 content-start align-top items-start text-start'>
-        <div className="my-14">
-          <h3 className="text-lg font-bold mb-2">Totais Gerais:</h3>
-          <p>Entradas: {entryExitSummary?.totalEntries}</p>
-          <p>Saídas: {entryExitSummary?.totalExits}</p>
-        </div>
-
-        <div className="my-14">
-          <h3 className="text-lg font-bold mb-2">Entradas por Tipo de Veículo:</h3>
-          <p>Carros: {vehicleReport?.data?.totalCarEntries}</p>
-          <p>Motocicletas: {vehicleReport?.data?.totalMotorcycleEntries}</p>
-          <p>Diferença (Carros - Motos): {carDifference}</p>
-        </div>
-      </div>
-    </div>
+      </BarChart>
+    </ResponsiveContainer>
   );
 };
 

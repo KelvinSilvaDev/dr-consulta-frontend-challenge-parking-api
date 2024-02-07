@@ -9,15 +9,17 @@ import { Label } from "./ui/label"
 import { useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface UserRegisterFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+export function UserRegisterForm({ className, ...props }: UserRegisterFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [form, setForm] = useState({
     username: '',
     password: '',
+    email: '',
+    name: '',
   })
-  const { login } = useAuth()
+  const { register } = useAuth()
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target
@@ -27,10 +29,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault()
     setIsLoading(true)
-    login(form.username, form.password)
-
-
-
+    register(form.username, form.password, form.email, form.name)
+    
     setTimeout(() => {
       setIsLoading(false)
     }, 3000)
@@ -40,6 +40,19 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     <div className={cn("grid gap-6", className)} {...props}>
       <form onSubmit={onSubmit}>
         <div className="grid gap-2">
+          <div className="grid gap-1">
+            <Label className="sr-only" htmlFor="name">
+              Name
+            </Label>
+            <Input
+              id="name"
+              placeholder="Name"
+              type="text"
+              autoComplete="name"
+              disabled={isLoading}
+              onChange={handleChange}
+            />
+          </div>
           <div className="grid gap-1">
             <Label className="sr-only" htmlFor="username">
               Username
@@ -51,6 +64,19 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               autoCapitalize="none"
               autoComplete="off"
               autoCorrect="off"
+              disabled={isLoading}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="grid gap-1">
+            <Label className="sr-only" htmlFor="email">
+              Email
+            </Label>
+            <Input
+              id="email"
+              placeholder="Email"
+              type="email"
+              autoComplete="email"
               disabled={isLoading}
               onChange={handleChange}
             />

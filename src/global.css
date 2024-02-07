@@ -77,16 +77,16 @@
     @apply bg-background text-foreground;
   }
   .dark input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 50px #030816 inset; /* cor do fundo do texto */;
-    -webkit-text-fill-color: white; /* cor do texto */
+    -webkit-box-shadow: 0 0 0 50px #030816 inset; 
+    -webkit-text-fill-color: white;
   }
   .dark input:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0 50px #07122f inset;
     -webkit-text-fill-color: white;
   }
   input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 50px white inset; /* cor do fundo do texto no tema light */;
-    -webkit-text-fill-color: black; /* cor do texto no tema light */
+    -webkit-box-shadow: 0 0 0 50px white inset; 
+    -webkit-text-fill-color: black; 
   }
 
   input:-webkit-autofill:focus {
@@ -94,7 +94,4 @@
     -webkit-text-fill-color: black;
   }
 
-  /* input:-internal-autofill-selected {
-    color: #000 !important;
-  } */
-}
+  

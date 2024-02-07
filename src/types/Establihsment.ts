@@ -1,5 +1,5 @@
 export type Establishment = {
-  id?: string;
+  id: string;
   name: string;
   cnpj: string;
   address: string;
